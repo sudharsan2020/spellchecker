@@ -1,0 +1,6 @@
+setup.py
+ola_spellchecker.egg-info/PKG-INFO
+ola_spellchecker.egg-info/SOURCES.txt
+ola_spellchecker.egg-info/dependency_links.txt
+ola_spellchecker.egg-info/requires.txt
+ola_spellchecker.egg-info/top_level.txt
