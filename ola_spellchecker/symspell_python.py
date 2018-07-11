@@ -213,13 +213,13 @@ def dameraulevenshtein(seq1, seq2):
     # However, only the current and two previous rows are needed at once,
     # so we only store those.
     oneago = None
-    thisrow = range(1, len(seq2) + 1) + [0]
-    for x in xrange(len(seq1)):
+    thisrow = list(range(1, len(seq2) + 1)) + [0]
+    for x in range(len(seq1)):
         # Python lists wrap around for negative indices, so put the
         # leftmost column at the *end* of the list. This matches with
         # the zero-indexed strings and saves extra calculation.
         twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
-        for y in xrange(len(seq2)):
+        for y in range(len(seq2)):
             delcost = oneago[y] + 1
             addcost = thisrow[y - 1] + 1
             subcost = oneago[y - 1] + (seq1[x] != seq2[y])
@@ -351,7 +351,8 @@ def get_suggestions(string, silent=False):
     # return list of suggestions with (correction,
     #                                  (frequency in corpus, edit distance)):
     as_list = suggest_dict.items()
-    outlist = sorted(as_list, key=lambda(term, (freq, dist)): (dist, -freq))
+    #outlist = sorted(as_list, key=lambda(term, (freq, dist)): (dist, -freq))
+    outlist = sorted(as_list, key=lambda x: (x[1][1], -x[1][0]))
 
     if verbose==0:
         return outlist[0]
