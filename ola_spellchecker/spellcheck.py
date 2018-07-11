@@ -21,9 +21,9 @@ class SpellCheck ():
     # This is used to check probability of words next to each other
     logging.info ('Loading corpus')
     # Add brown + corpus words
-    with open(corpus) as c:
+    with open(corpus, encoding='utf-8') as c:
       text = c.read()
-      corpus_sentences = sentence_tokenizer.tokenize(text.decode('utf-8'))
+      corpus_sentences = sentence_tokenizer.tokenize(text)
       corpus_words = [word for sent in corpus_sentences for word in tokenizer.tokenize(sent)]
 
       # final_words = [word for word in brown.words() + corpus_words]
@@ -129,7 +129,7 @@ class SpellCheck ():
           max_prob = prob
           correct_word = word
       return correct_word, freq
-    return map(find_max_prob, suggestions)
+    return list(map(find_max_prob, suggestions))
 
   def get_word_suggestions (self, word):
     if word in self.cache_suggestion:
