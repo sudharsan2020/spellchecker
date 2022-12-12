@@ -16,7 +16,7 @@ sentence_tokenizer = nltk.tokenize.punkt.PunktSentenceTokenizer()
 engine = inflect.engine()
 
 class SpellCheck ():
-  def __init__ (self, corpus = os.path.join(os.path.dirname(__file__), 'big.txt')):
+  def __init__(self, corpus = os.path.join(os.path.dirname(__file__), 'big.txt')):
     # create a 2 gram from brown corpus
     # This is used to check probability of words next to each other
     logging.info ('Loading corpus')
@@ -33,8 +33,8 @@ class SpellCheck ():
       self.freq_brown_1gram = nltk.FreqDist(final_words)
       self.len_brown = len(final_words)
 
-      self.cache = dict()
-      self.cache_suggestion = dict()
+      self.cache = {}
+      self.cache_suggestion = {}
 
       # Create dictionary
       create_dictionary(corpus_sentences)
@@ -55,12 +55,13 @@ class SpellCheck ():
   def unigram_prob (self, word):
     return float(self.freq_brown_1gram[word])/self.len_brown
 
-  def full_sentence_prob (self, words):
+  def full_sentence_prob(self, words):
     len_words = len(words)
-    prob = 0
-    for x in range(0, len_words):
-      prob += float(self.adjacent_prob(words[x], words[x + 1]) if x != len_words - 1 else self.unigram_prob(words[len_words - 1]))
-    return prob
+    return sum(
+        float(
+            self.adjacent_prob(words[x], words[x + 1]) if x != len_words -
+            1 else self.unigram_prob(words[len_words - 1]))
+        for x in range(len_words))
 
   def bigram_prob (self, idx, word, words):
     len_words = len(words) - 1
@@ -75,7 +76,7 @@ class SpellCheck ():
 
     return (self.adjacent_prob(word, words[idx - 1], True) + self.adjacent_prob(word, words[idx + 1])) + unigram_prob
 
-  def adjacent_prob (self, word, adjacent_word, reverse=False):
+  def adjacent_prob(self, word, adjacent_word, reverse=False):
     if reverse:
       key = ''.join([adjacent_word, word])
     else:
@@ -87,7 +88,7 @@ class SpellCheck ():
     spell_sug = [(term, freq) for term, freq in self.get_word_suggestions(adjacent_word) if freq[1] > 0]
     final_prob = 0
     max_prob = 0
-    if len(spell_sug) > 0:
+    if spell_sug:
       for suggestion, freq in spell_sug:
         word_prob = self.calculate_prob(word, suggestion) if reverse is False else self.calculate_prob(suggestion, word)
         if word_prob > max_prob:
@@ -112,10 +113,8 @@ class SpellCheck ():
       return corrected_word[:1].upper() + corrected_word[1:]
     return corrected_word
 
-  def get_word_homonyms (self, word):
-    if word in self.homonym_dictionary:
-      return self.homonym_dictionary[word]
-    return []
+  def get_word_homonyms(self, word):
+    return self.homonym_dictionary[word] if word in self.homonym_dictionary else []
 
   def word_case_probability (self, suggestions):
     def find_max_prob (sug):
@@ -137,9 +136,9 @@ class SpellCheck ():
     self.cache_suggestion[word] = get_suggestions(word, True) + self.get_word_homonyms(word)
     return self.cache_suggestion[word]
 
-  def correct (self, sentence, debug=False):
-    words_case_preserved = [word for word in tokenizer.tokenize(sentence)]
-    words = [word for word in words_case_preserved]
+  def correct(self, sentence, debug=False):
+    words_case_preserved = list(tokenizer.tokenize(sentence))
+    words = list(words_case_preserved)
     # sentence_prob = self.full_sentence_prob(words)
     # Todo: Addon sentence probability
     for idx, word in enumerate(words):
@@ -149,7 +148,7 @@ class SpellCheck ():
       suggestions = list(set(suggestions))
       fqs = [freq[1] for _, freq in suggestions]
 
-      if len(fqs) > 0 and fqs.count(fqs[0]) == len(fqs) and len(fqs) > 1:
+      if fqs and fqs.count(fqs[0]) == len(fqs) and len(fqs) > 1:
         suggestions = []
 
       for suggestion, freq in suggestions:

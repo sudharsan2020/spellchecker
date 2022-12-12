@@ -206,10 +206,10 @@ def load_dict_data():
     target_sentences = helper.load_data(target_path).split('\n')
 
     # source_sentences contains the entire input sequence file as text delimited by newline symbols.
-    print("Source: {}".format(source_sentences[:10]))
+    print(f"Source: {source_sentences[:10]}")
     # target_sentences contains the entire output sequence file as text delimited by newline symbols.
     # Each line corresponds to the line from source_sentences. target_sentences contains sorted characters of the line.
-    print("Target: {}".format(target_sentences[:10]))
+    print(f"Target: {target_sentences[:10]}")
 
     print("\nThe source is comprised of {:,} sentences.".format(len(source_sentences)))
 
@@ -245,8 +245,8 @@ def extract_character_vocab(data):
     special_words = ['<PAD>', '<UNK>', '<GO>',  '<EOS>']
 
     #set_words = set([character for line in data.split('\n') for character in line])
-    set_words = set([character for line in data for character in line])
-    int_to_vocab = {word_i: word for word_i, word in enumerate(special_words + list(set_words))}
+    set_words = {character for line in data for character in line}
+    int_to_vocab = dict(enumerate(special_words + list(set_words)))
     vocab_to_int = {word: word_i for word_i, word in int_to_vocab.items()}
 
     return int_to_vocab, vocab_to_int
@@ -254,7 +254,7 @@ def extract_character_vocab(data):
 def load_int_letter_translations(source, target):
     
     global source_int_to_letter, target_int_to_letter, source_letter_to_int, target_letter_to_int
-    
+
     # Check to see if conversion files have already been created
     if (os.path.isfile(SOURCE_INT_TO_LETTER)):
 
@@ -263,28 +263,28 @@ def load_int_letter_translations(source, target):
         with open(SOURCE_INT_TO_LETTER, 'r') as file:
             try:
                 source_int_to_letter = json.load(file)
-                print("Read {} data from file.".format(SOURCE_INT_TO_LETTER))
+                print(f"Read {SOURCE_INT_TO_LETTER} data from file.")
             except ValueError: # if the file is empty the ValueError will be thrown
                 data = {}
         source_int_to_letter = {int(k):v for k,v in source_int_to_letter.items()}
         with open(TARGET_INT_TO_LETTER, 'r') as file:
             try:
                 target_int_to_letter = json.load(file)
-                print("Read {} data from file.".format(TARGET_INT_TO_LETTER))
+                print(f"Read {TARGET_INT_TO_LETTER} data from file.")
             except ValueError: # if the file is empty the ValueError will be thrown
                 data = {}
         target_int_to_letter = {int(k):v for k,v in target_int_to_letter.items()}
         with open(SOURCE_LETTER_TO_INT, 'r') as file:
             try:
                 source_letter_to_int = json.load(file)
-                print("Read {} data from file.".format(SOURCE_LETTER_TO_INT))
+                print(f"Read {SOURCE_LETTER_TO_INT} data from file.")
             except ValueError: # if the file is empty the ValueError will be thrown
                 data = {}
         source_letter_to_int = {k:int(v) for k,v in source_letter_to_int.items()}
         with open(TARGET_LETTER_TO_INT, 'r') as file:
             try:
                 target_letter_to_int = json.load(file)
-                print("Read {} data from file.".format(TARGET_LETTER_TO_INT))
+                print(f"Read {TARGET_LETTER_TO_INT} data from file.")
             except ValueError: # if the file is empty the ValueError will be thrown
                 data = {}
         target_letter_to_int = {k:int(v) for k,v in target_letter_to_int.items()}
@@ -294,22 +294,22 @@ def load_int_letter_translations(source, target):
         # Build int2letter and letter2int dicts
         source_int_to_letter, source_letter_to_int = extract_character_vocab(source)
         target_int_to_letter, target_letter_to_int = extract_character_vocab(target)
-        print("Source INT to letter: {}".format(source_int_to_letter))
-        print("Target INT to letter: {}\n".format(target_int_to_letter))
+        print(f"Source INT to letter: {source_int_to_letter}")
+        print(f"Target INT to letter: {target_int_to_letter}\n")
 
         # Save source_int_to_letter, target_int_to_letter & source_letter_to_int for loading later after graph is saved
         with open(SOURCE_INT_TO_LETTER, 'w') as output_file:
             json.dump(source_int_to_letter, output_file)
-        print("Wrote {} data to file.".format(SOURCE_INT_TO_LETTER))
+        print(f"Wrote {SOURCE_INT_TO_LETTER} data to file.")
         with open(TARGET_INT_TO_LETTER, 'w') as output_file:
             json.dump(target_int_to_letter, output_file)
-        print("Wrote {} data to file.".format(TARGET_INT_TO_LETTER))
+        print(f"Wrote {TARGET_INT_TO_LETTER} data to file.")
         with open(SOURCE_LETTER_TO_INT, 'w') as output_file:
             json.dump(source_letter_to_int, output_file)
-        print("Wrote {} data to file.".format(SOURCE_LETTER_TO_INT))
+        print(f"Wrote {SOURCE_LETTER_TO_INT} data to file.")
         with open(TARGET_LETTER_TO_INT, 'w') as output_file:
             json.dump(target_letter_to_int, output_file)
-        print("Wrote {} data to file.".format(TARGET_LETTER_TO_INT))
+        print(f"Wrote {TARGET_LETTER_TO_INT} data to file.")
 
 def produce_letter_ids(source, target):
     
@@ -340,9 +340,9 @@ print()
 
 
 print('\nFirst 10 sentence:')
-for i in range (0, 10):
-    print("\nSource --> {}".format(source_letter_ids[i]))
-    print("Target --> {}".format(target_letter_ids[i]))
+for i in range(10):
+    print(f"\nSource --> {source_letter_ids[i]}")
+    print(f"Target --> {target_letter_ids[i]}")
 
 
 # ## Character Sequence to Sequence Model
@@ -356,13 +356,13 @@ for i in range (0, 10):
 import tensorflow as tf
 
 # Check TensorFlow Version
-print('TensorFlow Version: {}'.format(tf.__version__))
+print(f'TensorFlow Version: {tf.__version__}')
 
 # Check for a GPU
 if not tf.test.gpu_device_name():
     print('No GPU found. Please use a GPU to train your neural network.')
 else:
-    print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
+    print(f'Default GPU Device: {tf.test.gpu_device_name()}')
 
 
 # ### Hyperparameters
@@ -375,37 +375,32 @@ if (len(wrong_sentencess) > 10000):
     # We are using the big data
     print("Using hyperparameters for the big data with {:,} source sentences.".format(len(wrong_sentencess)))
     epochs = 4       # Number of Epochs
-    batch_size = 128 # Batch Size
-
     rnn_size = 512   # RNN Size
-    num_layers = 2   # Number of Layers
     encoding_embedding_size = 512 # Encoding embedding Size
     decoding_embedding_size = 512 # Decoding embedding Size
-    keep_probability = 0.7 # keep probability
-
-    learning_rate = 0.001 # Learning Rate
-    
 else:
     
     # We are using the small data
     print("Using hyperparameters for the small data with {:,} source sentences.".format(len(wrong_sentencess)))
     epochs = 60 # Number of Epochs (normally 60 but reduced to test retraining model)
-    batch_size = 128 # Batch Size
     rnn_size = 50 # RNN Size    
-    num_layers = 2 # Number of Layers    
     encoding_embedding_size = 15 # Embedding Size
     decoding_embedding_size = 15 # Embedding Size
-    keep_probability = 0.7 # keep probability
-    learning_rate = 0.001 # Learning Rate
+
+learning_rate = 0.001 # Learning Rate
+
+keep_probability = 0.7 # keep probability
+
+num_layers = 2   # Number of Layers
+batch_size = 128 # Batch Size
 
 def get_hyperparameters_message():
-    message  = "Batch size: {}\n".format(batch_size)
-    message += "RNN size  : {}\n".format(rnn_size)
-    message += "Num layers: {}\n".format(num_layers)
-    message += "Enc. size : {}\n".format(encoding_embedding_size)
-    message += "Dec. size : {}\n".format(decoding_embedding_size)
-    message += "Keep prob.: {}\n".format(keep_probability)
-    message += "Learn rate: {}\n\n".format(learning_rate)
+    message = f"Batch size: {batch_size}\n" + f"RNN size  : {rnn_size}\n"
+    message += f"Num layers: {num_layers}\n"
+    message += f"Enc. size : {encoding_embedding_size}\n"
+    message += f"Dec. size : {decoding_embedding_size}\n"
+    message += f"Keep prob.: {keep_probability}\n"
+    message += f"Learn rate: {learning_rate}\n\n"
     return message
 
 # Write batch_size to file for loading after graph has been saved
@@ -535,9 +530,7 @@ def encoding_layer(input_data, rnn_size, num_layers, keep_prob, source_sequence_
 def process_decoder_input(target_data, vocab_to_int, batch_size):
     '''Remove the last word id from each batch and concat the <GO> to the begining of each batch'''
     ending = tf.strided_slice(target_data, [0, 0], [batch_size, -1], [1, 1])
-    dec_input = tf.concat([tf.fill([batch_size, 1], vocab_to_int['<GO>']), ending], 1)
-
-    return dec_input
+    return tf.concat([tf.fill([batch_size, 1], vocab_to_int['<GO>']), ending], 1)
 
 #
 # ### Set up the decoder components
@@ -760,27 +753,21 @@ import numpy as np
 
 def pad_sentence_batch(sentence_batch, pad_int):
     """Pad sentences with <PAD> so that each sentence of a batch has the same length"""
-    max_sentence = max([len(sentence) for sentence in sentence_batch])
+    max_sentence = max(len(sentence) for sentence in sentence_batch)
     return [sentence + [pad_int] * (max_sentence - len(sentence)) for sentence in sentence_batch]
 
 def get_batches(targets, sources, batch_size, source_pad_int, target_pad_int):
     """Batch targets, sources, and the lengths of their sentences together"""
-    for batch_i in range(0, len(sources)//batch_size):
+    for batch_i in range(len(sources)//batch_size):
         start_i = batch_i * batch_size
         sources_batch = sources[start_i:start_i + batch_size]
         targets_batch = targets[start_i:start_i + batch_size]
         pad_sources_batch = np.array(pad_sentence_batch(sources_batch, source_pad_int))
         pad_targets_batch = np.array(pad_sentence_batch(targets_batch, target_pad_int))
-        
+
         # Need the lengths for the _lengths parameters
-        pad_targets_lengths = []
-        for target in pad_targets_batch:
-            pad_targets_lengths.append(len(target))
-        
-        pad_source_lengths = []
-        for source in pad_sources_batch:
-            pad_source_lengths.append(len(source))
-        
+        pad_targets_lengths = [len(target) for target in pad_targets_batch]
+        pad_source_lengths = [len(source) for source in pad_sources_batch]
         yield pad_targets_batch, pad_sources_batch, pad_targets_lengths, pad_source_lengths
 
 
@@ -798,18 +785,15 @@ valid_target = target_letter_ids[:batch_size]
 (valid_targets_batch, valid_sources_batch, valid_targets_lengths, valid_sources_lengths) = next(get_batches(valid_target, valid_source, batch_size, 
                    source_letter_to_int['<PAD>'], target_letter_to_int['<PAD>']))
 
-if (len(wrong_sentencess) > 10000):
-    display_step = 100 # Check training loss after each of this many batches with large data
-else:
-    display_step = 20 # Check training loss after each of this many batches with small data
+display_step = 100 if (len(wrong_sentencess) > 10000) else 20
 
 def train(epoch_i):
     
     global train_graph, train_op, cost, input_data, targets, lr
     global source_sequence_length, target_sequence_length, keep_prob
-    
+
     # Test to see if graph already exists
-    if os.path.exists(checkpoint + ".meta"):
+    if os.path.exists(f"{checkpoint}.meta"):
         print("Reloading existing graph to continue training.")
         reloading = True    
         train_graph = tf.Graph()
@@ -818,11 +802,11 @@ def train(epoch_i):
         reloading = False
         with train_graph.as_default():
             saver = tf.train.Saver()
-    
-    with tf.Session(graph=train_graph) as sess:    
+
+    with tf.Session(graph=train_graph) as sess:
 
         if reloading:
-            saver = tf.train.import_meta_graph(checkpoint + '.meta')
+            saver = tf.train.import_meta_graph(f'{checkpoint}.meta')
             saver.restore(sess, checkpoint) 
 
             # Restore variables
@@ -841,7 +825,7 @@ def train(epoch_i):
             sess.run(tf.global_variables_initializer())
 
         message = "" # Clear message to be sent in body of email
-        
+
         for batch_i, (targets_batch, sources_batch, targets_lengths, sources_lengths) in enumerate(
                 get_batches(train_target, train_source, batch_size,
                            source_letter_to_int['<PAD>'],
@@ -858,7 +842,7 @@ def train(epoch_i):
                  keep_prob: keep_probability})
 
             batch = batch_i + 1 # batch_i starts at zero so batch is the batch number
-            
+
             # Debug message updating us on the status of the training
             if (batch % display_step == 0 and batch > 0) or batch == (len(train_source) // batch_size):
 
@@ -880,7 +864,7 @@ def train(epoch_i):
         # Save model at the end of each epoch
         print("Saving graph...")
         saver.save(sess, checkpoint)
-        
+
         return message # return message to be sent in body of email
 
 
@@ -894,7 +878,7 @@ def train(epoch_i):
 with open(GRAPH_PARAMETERS, 'r') as file:
     try:
         batch_size = int(file.read())
-        print("Loaded batch_size = {}".format(batch_size))
+        print(f"Loaded batch_size = {batch_size}")
     except ValueError:
         batch_size = 128
         print("Unable to load batch_size from file so using default 128.")
@@ -928,7 +912,7 @@ def get_accuracy(wrong_sentencess, correct_sentencess):
     with tf.Session(graph=loaded_graph) as sess:
 
         # Load saved model
-        loader = tf.train.import_meta_graph(checkpoint + '.meta')
+        loader = tf.train.import_meta_graph(f'{checkpoint}.meta')
         loader.restore(sess, checkpoint)
 
         # Load graph variables
@@ -938,7 +922,7 @@ def get_accuracy(wrong_sentencess, correct_sentencess):
         target_sequence_length = loaded_graph.get_tensor_by_name('target_sequence_length:0')
         keep_prob = loaded_graph.get_tensor_by_name('keep_prob:0')
 
-        for batch_i,(targets_batch, sources_batch, targets_lengths, sources_lengths)         in enumerate(get_batches(target_letter_ids, source_letter_ids, batch_size, 
+        for batch_i,(targets_batch, sources_batch, targets_lengths, sources_lengths) in enumerate(get_batches(target_letter_ids, source_letter_ids, batch_size, 
                                  source_letter_to_int['<PAD>'], target_letter_to_int['<PAD>'])):
 
             # Multiply by batch_size to match the model's input parameters
@@ -948,7 +932,13 @@ def get_accuracy(wrong_sentencess, correct_sentencess):
                                               keep_prob: 1.0})
 
             for n in range(batch_size):
-                answer = "".join([target_int_to_letter[i] for i in answer_logits[n] if (i != pad and i != eos)])
+                answer = "".join(
+                    [
+                        target_int_to_letter[i]
+                        for i in answer_logits[n]
+                        if i not in [pad, eos]
+                    ]
+                )
                 target = correct_sentencess[batch_i * batch_size + n]
                 total += 1
                 if (answer == target):
@@ -960,7 +950,7 @@ def get_accuracy(wrong_sentencess, correct_sentencess):
                                                                  matches/total))
 
         print("Final accuracy = {:.1%}\n".format(matches/total))
-        
+
         return matches/total
 
 
@@ -984,9 +974,9 @@ for epoch_i in range(1, epochs + 1):
     seconds = end - start
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
-    print("Model Trained in {}h:{}m:{}s and Saved".format(int(h), int(m), int(s)))
-    message += "\nModel training for {}h:{}m:{}s and saved.".format(int(h), int(m), int(s))
-    
+    print(f"Model Trained in {int(h)}h:{int(m)}m:{int(s)}s and Saved")
+    message += f"\nModel training for {int(h)}h:{int(m)}m:{int(s)}s and saved."
+
     # Get current accuracy
     accuracy = get_accuracy(validation_source_sentences, validation_target_sentences)
     message += "\nCurrent accuracy = {:.1%}".format(accuracy)
