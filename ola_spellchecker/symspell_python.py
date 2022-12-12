@@ -111,7 +111,7 @@ def get_deletes_list(w):
        deleted'''
     deletes = []
     queue = [w]
-    for d in range(max_edit_distance):
+    for _ in range(max_edit_distance):
         temp_queue = []
         for word in queue:
             if len(word)>1:
@@ -245,7 +245,7 @@ def get_suggestions(string, silent=False):
     queue = [string]
     q_dictionary = {}  # items other than string that we've checked
 
-    while len(queue)>0:
+    while queue:
         q_item = queue[0]  # pop
         queue = queue[1:]
 
@@ -354,21 +354,7 @@ def get_suggestions(string, silent=False):
     #outlist = sorted(as_list, key=lambda(term, (freq, dist)): (dist, -freq))
     outlist = sorted(as_list, key=lambda x: (x[1][1], -x[1][0]))
 
-    if verbose==0:
-        return outlist[0]
-    else:
-        return outlist
-
-    '''
-    Option 1:
-    ['file', 'five', 'fire', 'fine', ...]
-
-    Option 2:
-    [('file', (5, 0)),
-     ('five', (67, 1)),
-     ('fire', (54, 1)),
-     ('fine', (17, 1))...]
-    '''
+    return outlist[0] if verbose==0 else outlist
 
 def best_word(s, silent=False):
     try:

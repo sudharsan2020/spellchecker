@@ -24,12 +24,11 @@ def display_time(seconds, granularity=2):
     result = []
 
     for name, count in intervals:
-        value = seconds // count
-        if value:
+        if value := seconds // count:
             seconds -= value * count
             if value == 1:
                 name = name.rstrip('s')
-            result.append("{} {}".format(value, name))
+            result.append(f"{value} {name}")
     return ', '.join(result[:granularity])
 
 #Check for duplicates before adding to dict
@@ -88,23 +87,21 @@ class parseTextFile:
         #print ("Total number of mismatched lines:", self.misMatchCount)      
         return self.my_lang_dict, self.my_issue_list
  
-def printDict(myDict)    :
+def printDict(myDict):
     for k,v in myDict.items():
-        print("{}:{}".format(k,v))
+        print(f"{k}:{v}")
         
 def writeToFile(fileName, my_list):
 
     filePath = os.path.dirname(os.path.realpath(__file__)) + "\\" + str(fileName)
-    
+
     ctr = 0
     #Write the contents to file
     with open(filePath, "wb") as file:
         for value in my_list:
-            if ctr == 0:
-                file.write(value.encode('utf8'))
-            else:
+            if ctr != 0:
                 file.write(b"\n")
-                file.write(value.encode('utf8'))
+            file.write(value.encode('utf8'))
             ctr += 1
 
 # Main function wrapper
@@ -112,17 +109,17 @@ if __name__ == "__main__":
 
     #Start time
     startTime = time.time()    
-    
+
     dir_path = r"C:\\Users\\sundsudh\\Downloads\\dataset1\\dataset1\\rawTextAndHumanCorrectionPairs"
     os.chdir(dir_path)
     text_files = [file for file in os.listdir() if os.path.isfile(file) and file.endswith(".txt")]
-   
+
     #Call the Text file parser
     pt = parseTextFile()
 
     # Read the files sequentially
     for file in text_files:
-          
+
         my_dict,my_issue_list = pt.readFromFile(file)
 
     #Write the contents to file
@@ -133,5 +130,5 @@ if __name__ == "__main__":
 
     #Print the result
     runTime = int(time.time() - startTime)
-    print("Parsing completed in :{} ".format(display_time(runTime)))
+    print(f"Parsing completed in :{display_time(runTime)} ")
     
